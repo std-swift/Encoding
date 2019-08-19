@@ -40,9 +40,13 @@ targets: [
 - `littleEndianBytes: [UInt8]`
 - `bigEndianBytes: [UInt8]`
 
-### `Array where Element == UInt8`
+### `Collection where Element == UInt8`
 
 - `hexString: String`
+
+### `RangeReplaceableCollection where Element == UInt8`
+
+- `init?<S: StringProtocol>(hexString: S)`
 
 ### `Array where Element: BinaryInteger`
 
@@ -50,6 +54,16 @@ targets: [
 func asArray<T: BinaryInteger>(endinanness: Endianness, sourceBits: Int, resultBits: Int) -> [T]
 func asBigEndian<T: BinaryInteger>(sourceBits: Int = Element().bitWidth, resultBits: Int = T().bitWidth) -> [T]
 func asLittleEndian<T: BinaryInteger>(sourceBits: Int = Element().bitWidth, resultBits: Int = T().bitWidth) -> [T]
+```
+
+### `ContiguousArray where Element: BinaryInteger`
+
+Offers 15% better performance over the `Array` version
+
+```Swift
+func asArray<T: BinaryInteger>(endinanness: Endianness, sourceBits: Int, resultBits: Int) -> ContiguousArray<T>
+func asBigEndian<T: BinaryInteger>(sourceBits: Int = Element().bitWidth, resultBits: Int = T().bitWidth) -> ContiguousArray<T>
+func asLittleEndian<T: BinaryInteger>(sourceBits: Int = Element().bitWidth, resultBits: Int = T().bitWidth) -> ContiguousArray<T>
 ```
 
 ### `StreamDecoder`
