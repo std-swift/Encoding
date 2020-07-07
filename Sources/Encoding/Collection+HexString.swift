@@ -12,10 +12,13 @@ internal let indexToHexMap: [Character] = [
 extension Collection where Element == UInt8 {
 	@inlinable
 	public var hexString: String {
-		return String(self
-			.flatMap { [$0 >> 4, $0 & 0x0F] }
-			.map { indexToHexMap[Int($0)] }
-		)
+		var string = ""
+		string.reserveCapacity(self.count << 1)
+		for element in self {
+			string.append(indexToHexMap[Int(element >> 4)])
+			string.append(indexToHexMap[Int(element & 0x0F)])
+		}
+		return string
 	}
 }
 
@@ -23,17 +26,16 @@ extension RangeReplaceableCollection where Element == UInt8 {
 	@inlinable
 	public init?<S: StringProtocol>(hexString: S) {
 		guard hexString.count % 2 == 0 else { return nil }
-		self.init()
 		let count = hexString.count >> 1
+		self.init()
 		self.reserveCapacity(count)
-		var startIndex = hexString.startIndex
-		var endIndex = startIndex
-		for _ in 0..<count {
-			endIndex = hexString.index(startIndex, offsetBy: 2)
-			let elements = hexString[startIndex..<endIndex]
-			guard let byte = UInt8(elements, radix: 16) else { return nil }
-			self.append(byte)
-			startIndex = endIndex
+		var index = hexString.startIndex
+		while index != hexString.endIndex {
+			guard let high = hexString[index].hexDigitValue else { return nil }
+			index = hexString.index(after: index)
+			guard let low = hexString[index].hexDigitValue else { return nil }
+			index = hexString.index(after: index)
+			self.append(UInt8((high << 4) | low))
 		}
 	}
 }

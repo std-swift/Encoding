@@ -29,4 +29,23 @@ final class HexConversionTests: XCTestCase {
 		let array = [UInt8](hexString: string)
 		XCTAssertEqual(array, initial)
 	}
+	
+	func testHexStringPerformance() {
+		let data = [[UInt8]](repeating: [UInt8](0..<16), count: 10_000)
+			.flatMap { $0 }
+
+		measure {
+			_ = data.hexString
+		}
+	}
+	
+	func testHexInitPerformance() {
+		let data = [[UInt8]](repeating: [UInt8](0..<16), count: 10_000)
+			.flatMap { $0 }
+		let string = data.hexString
+		
+		measure {
+			_ = [UInt8](hexString: string)
+		}
+	}
 }
