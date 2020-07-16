@@ -14,9 +14,11 @@ extension Collection where Element == UInt8 {
 	public var hexString: String {
 		var string = ""
 		string.reserveCapacity(self.count << 1)
-		for element in self {
-			string.append(indexToHexMap[Int(element >> 4)])
-			string.append(indexToHexMap[Int(element & 0x0F)])
+		indexToHexMap.withUnsafeBufferPointer { buffer in
+			for element in self {
+				string.append(buffer[Int(element >> 4)])
+				string.append(buffer[Int(element & 0x0F)])
+			}
 		}
 		return string
 	}
