@@ -77,36 +77,40 @@ extension Array where Element: BinaryInteger {
 		precondition(resultBits <= T().bitWidth)
 		
 		let resultCount = (self.count*sourceBits + resultBits - 1) / resultBits
-		var result = [T](repeating: 0, count: resultCount)
-		
-		var resultIndex = 0
-		var resultBitIndex = resultBits
-		
-		for word in self {
-			var sourceBitIndex = 0
-			while sourceBitIndex < sourceBits {
-				let bitCount: Int
-				let bits: T
-				switch endinanness {
-					case .big:
-						let calcSBI = sourceBits - sourceBitIndex
-						bitCount = Swift.min(resultBitIndex, calcSBI)
-						bits = T(word >> (calcSBI - bitCount)) & ~(~T(0) << bitCount)
-						result[resultIndex] |= bits << (resultBitIndex - bitCount)
-					case .little:
-						bitCount = Swift.min(resultBitIndex, sourceBits - sourceBitIndex)
-						bits = T(word >> sourceBitIndex) & ~(~T(0) << bitCount)
-						result[resultIndex] |= bits << (resultBits - resultBitIndex)
+		let contiguous = ContiguousArray<T>(unsafeUninitializedCapacity: resultCount) { (buffer, count) in
+			count = resultCount // Required by the initializer
+			
+			var resultIndex = 0
+			var resultBitIndex = resultBits
+			
+			buffer[0] = 0
+			for word in self {
+				var sourceBitIndex = 0
+				while sourceBitIndex < sourceBits {
+					if resultBitIndex == 0 {
+						resultBitIndex = resultBits
+						resultIndex += 1
+						buffer[resultIndex] = 0
+					}
+					let bitCount: Int
+					let bits: T
+					switch endinanness {
+						case .big:
+							let calcSBI = sourceBits - sourceBitIndex
+							bitCount = Swift.min(resultBitIndex, calcSBI)
+							bits = T(word >> (calcSBI - bitCount)) & ~(~T(0) << bitCount)
+							buffer[resultIndex] |= bits << (resultBitIndex - bitCount)
+						case .little:
+							bitCount = Swift.min(resultBitIndex, sourceBits - sourceBitIndex)
+							bits = T(word >> sourceBitIndex) & ~(~T(0) << bitCount)
+							buffer[resultIndex] |= bits << (resultBits - resultBitIndex)
+					}
+					resultBitIndex -= bitCount
+					sourceBitIndex += bitCount
 				}
-				resultBitIndex -= bitCount
-				if resultBitIndex == 0 {
-					resultBitIndex = resultBits
-					resultIndex += 1
-				}
-				sourceBitIndex += bitCount
 			}
 		}
-		return result
+		return [T](contiguous)
 	}
 }
 
@@ -179,35 +183,38 @@ extension ContiguousArray where Element: BinaryInteger {
 		precondition(resultBits <= T().bitWidth)
 		
 		let resultCount = (self.count*sourceBits + resultBits - 1) / resultBits
-		var result = ContiguousArray<T>(repeating: 0, count: resultCount)
-		
-		var resultIndex = 0
-		var resultBitIndex = resultBits
-		
-		for word in self {
-			var sourceBitIndex = 0
-			while sourceBitIndex < sourceBits {
-				let bitCount: Int
-				let bits: T
-				switch endinanness {
-					case .big:
-						let calcSBI = sourceBits - sourceBitIndex
-						bitCount = Swift.min(resultBitIndex, calcSBI)
-						bits = T(word >> (calcSBI - bitCount)) & ~(~T(0) << bitCount)
-						result[resultIndex] |= bits << (resultBitIndex - bitCount)
-					case .little:
-						bitCount = Swift.min(resultBitIndex, sourceBits - sourceBitIndex)
-						bits = T(word >> sourceBitIndex) & ~(~T(0) << bitCount)
-						result[resultIndex] |= bits << (resultBits - resultBitIndex)
+		return ContiguousArray<T>(unsafeUninitializedCapacity: resultCount) { (buffer, count) in
+			count = resultCount // Required by the initializer
+			
+			var resultIndex = 0
+			var resultBitIndex = resultBits
+			
+			buffer[0] = 0
+			for word in self {
+				var sourceBitIndex = 0
+				while sourceBitIndex < sourceBits {
+					if resultBitIndex == 0 {
+						resultBitIndex = resultBits
+						resultIndex += 1
+						buffer[resultIndex] = 0
+					}
+					let bitCount: Int
+					let bits: T
+					switch endinanness {
+						case .big:
+							let calcSBI = sourceBits - sourceBitIndex
+							bitCount = Swift.min(resultBitIndex, calcSBI)
+							bits = T(word >> (calcSBI - bitCount)) & ~(~T(0) << bitCount)
+							buffer[resultIndex] |= bits << (resultBitIndex - bitCount)
+						case .little:
+							bitCount = Swift.min(resultBitIndex, sourceBits - sourceBitIndex)
+							bits = T(word >> sourceBitIndex) & ~(~T(0) << bitCount)
+							buffer[resultIndex] |= bits << (resultBits - resultBitIndex)
+					}
+					resultBitIndex -= bitCount
+					sourceBitIndex += bitCount
 				}
-				resultBitIndex -= bitCount
-				if resultBitIndex == 0 {
-					resultBitIndex = resultBits
-					resultIndex += 1
-				}
-				sourceBitIndex += bitCount
 			}
 		}
-		return result
 	}
 }
