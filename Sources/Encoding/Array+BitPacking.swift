@@ -77,6 +77,7 @@ extension Array where Element: BinaryInteger {
 		precondition(resultBits <= T().bitWidth)
 		
 		let resultCount = (self.count*sourceBits + resultBits - 1) / resultBits
+		if resultCount == 0 { return [] }
 		let contiguous = ContiguousArray<T>(unsafeUninitializedCapacity: resultCount) { (buffer, count) in
 			count = resultCount // Required by the initializer
 			
@@ -183,6 +184,7 @@ extension ContiguousArray where Element: BinaryInteger {
 		precondition(resultBits <= T().bitWidth)
 		
 		let resultCount = (self.count*sourceBits + resultBits - 1) / resultBits
+		if resultCount == 0 { return [] }
 		return ContiguousArray<T>(unsafeUninitializedCapacity: resultCount) { (buffer, count) in
 			count = resultCount // Required by the initializer
 			
