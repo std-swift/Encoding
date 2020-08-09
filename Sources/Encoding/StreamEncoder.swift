@@ -5,15 +5,15 @@
 
 /// Encodes a stream of `Element` returning `Partial` values when possible
 public protocol StreamEncoder {
-	associatedtype Element
+	associatedtype Decoded
 	associatedtype Partial
 	associatedtype Encoded
 	
-	/// Encode a sequence of `Element` and buffer the encoded value
-	mutating func encode<T: Sequence>(_ elements: T) where T.Element == Element
+	/// Encode and buffer
+	mutating func encode(_ decoded: Decoded)
 	
-	/// Encode a sequence of `Element` and return the buffered value
-	mutating func encodePartial<T: Sequence>(_ elements: T) -> Partial where T.Element == Element
+	/// Encode and return (and empty) the buffered value
+	mutating func encodePartial(_ decoded: Decoded) -> Partial
 	
 	/// Finalizes the encoder state and returns the buffered value
 	///

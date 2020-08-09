@@ -7,18 +7,18 @@ import XCTest
 import Encoding
 
 struct SumEncoder: StreamEncoder {
-	typealias Element = Int
-	typealias Partial = Element
-	typealias Encoded = Element
+	typealias Decoded = [Int]
+	typealias Partial = Int
+	typealias Encoded = Int
 	
-	private var value: Element = 0
+	private var value: Int = 0
 	
-	mutating func encode<T: Sequence>(_ elements: T) where T.Element == Element {
-		self.value = elements.reduce(self.value, +)
+	mutating func encode(_ decoded: Decoded) {
+		self.value = decoded.reduce(self.value, +)
 	}
 	
-	mutating func encodePartial<T: Sequence>(_ elements: T) -> Partial where T.Element == Element {
-		self.value = elements.reduce(self.value, +)
+	mutating func encodePartial(_ decoded: Decoded) -> Partial {
+		self.value = decoded.reduce(self.value, +)
 		return self.value
 	}
 	
@@ -28,18 +28,18 @@ struct SumEncoder: StreamEncoder {
 }
 
 struct SumDecoder: StreamDecoder {
-	typealias Element = Int
-	typealias Partial = Element
-	typealias Decoded = Element
+	typealias Encoded = [Int]
+	typealias Partial = Int
+	typealias Decoded = Int
 	
-	private var value: Element = 0
+	private var value: Int = 0
 	
-	mutating func decode<T: Sequence>(_ elements: T) where T.Element == Element {
-		self.value = elements.reduce(self.value, +)
+	mutating func decode(_ encoded: Encoded) {
+		self.value = encoded.reduce(self.value, +)
 	}
 	
-	mutating func decodePartial<T: Sequence>(_ elements: T) -> Partial where T.Element == Element {
-		self.value = elements.reduce(self.value, +)
+	mutating func decodePartial(_ encoded: Encoded) -> Partial {
+		self.value = encoded.reduce(self.value, +)
 		return self.value
 	}
 	

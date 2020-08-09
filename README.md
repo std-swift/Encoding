@@ -18,7 +18,7 @@ Hex strings, endinanness, and bit packing
 Add the following line to the dependencies in your `Package.swift` file:
 
 ```Swift
-.package(url: "https://github.com/std-swift/Encoding.git", from: "2.0.0")
+.package(url: "https://github.com/std-swift/Encoding.git", from: "3.0.0")
 ```
 
 Add `Encoding` as a dependency for your target:
